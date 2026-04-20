@@ -14,10 +14,25 @@ Today was mostly about getting the house in order before the real math starts. I
 
 * **The Logic:** Decided to use **Dimensionless Units** ($G=1$). It makes the equations much cleaner and avoids those tiny decimals that usually crash simulations.
 
-### Key Insight
+### Key Insight (1)
 
 I realized that using the vector form $\mathbf{a} = G m \frac{\mathbf{r}}{r^3}$ is much easier to code than trying to calculate angles with sine and cosine. It handles the direction automatically.
 
+## April 20, 2026
+
+**Status:** Day 2 - Building the Engine
+**Focus:** Implementing the ODE Right-Hand Side (RHS)
+
+### Accomplishments
+
+* Created `src/physics.py` with a vectorized `get_derivatives` function.
+* Utilized NumPy's `.reshape()` to transform the flat 12-variable state vector into a readable (3, 2) coordinate matrix during calculation.
+* Implemented the $1/r^3$ gravitational force vector logic, ensuring that self-interaction ($i=j$) is excluded to avoid singularities.
+
+### Key Insight (2)
+
+Reshaping the state vector within the derivative function allows for "Human-Readable Math" while maintaining "Computer-Readable Structure" for the integrator. It bridges the gap between 2D physical space and 1D state space.
+
 ### Next Step
 
-Start writing the actual `get_derivatives` function in `src/physics.py`. I'll start with just 2 bodies to make sure they orbit correctly before I add the third one and let the chaos begin.
+Set up the `integrators.py` file to include the RK4 stepper.
