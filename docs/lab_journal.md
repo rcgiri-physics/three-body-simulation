@@ -36,3 +36,10 @@ Reshaping the state vector within the derivative function allows for "Human-Read
 ### Next Step
 
 Set up the `integrators.py` file to include the RK4 stepper.
+
+
+## April 21, 2026
+
+### Strategy: Decided to utilize `scipy.integrate.solve_ivp` directly.
+
+Reasoning: Manual fixed-step integrators are prone to "energy leakage" and failure during close approaches in N-body systems. By using RK45 with adaptive stepping, I can ensure the simulation maintains a high degree of energy conservation even as the system approaches chaos.
