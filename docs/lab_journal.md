@@ -40,6 +40,37 @@ Set up the `integrators.py` file to include the RK4 stepper.
 
 ## April 21, 2026
 
-### Strategy: Decided to utilize `scipy.integrate.solve_ivp` directly.
+**Status**: Day 3 - Advanced Integration
+**Focus**: Implementing SciPy's solve_ivp for adaptive time-stepping.
 
-Reasoning: Manual fixed-step integrators are prone to "energy leakage" and failure during close approaches in N-body systems. By using RK45 with adaptive stepping, I can ensure the simulation maintains a high degree of energy conservation even as the system approaches chaos.
+### Accomplishments:
+
+- Library Integration: Integrated `scipy.integrate.solve_ivp` as the primary solver.
+
+- Stability Control: Configured the RK45 method with high-precision tolerances ($rtol=10^{-9}$, $atol=10^{-12}$).
+
+### Technical Decision:
+
+While manual fixed-step integrators are educational, they are prone to "energy leakage" during close stellar encounters. By using an adaptive RK45 algorithm, the simulation can dynamically shrink the time step when the potential energy gradient is high, ensuring physical reality is maintained even in chaotic regimes.
+
+## April 22, 2026
+**Status:** Day 4 - First Visual Results
+**Focus:** Scripting the simulation and verifying the model with known periodic orbits.
+
+### Accomplishments:
+* **Automation:** Created `scripts/run_simulation.py` to decouple the laboratory execution from the core physics engine in `src/`.
+* **Verification:** Successfully simulated the Chenciner-Montgomery Figure-Eight orbit using high-precision initial conditions.
+* **Visualization:** Generated a trajectory plot using Matplotlib, confirming that the three bodies follow the same spatial locus with a relative time delay of $T/3$.
+
+### Technical Observations
+
+The Figure-Eight is a zero-angular-momentum solution. While it looks like a single green curve, it actually represents the paths of all three bodies overlaid. The symmetry of the loops and the sharpness of the central crossing point confirm that the `solve_ivp` adaptive integrator (RK45) is handling the potential energy gradients correctly. Using a relative tolerance of $10^{-9}$ was sufficient to keep the orbit periodic for 5 time units without visible drift.
+
+### Image Analysis (figure_eight.png):
+
+* **Locus:** All three bodies share the same path.
+* **Symmetry:** The crossing point is exactly at $(0,0)$.
+* **Stability:** The lines overlap perfectly over multiple cycles, indicating minimal numerical dissipation (energy loss).
+
+### Next Step:
+Quantify the "Numerical Health" of the system by implementing an Energy Conservation (Hamiltonian) check.
