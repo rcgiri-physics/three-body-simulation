@@ -12,16 +12,21 @@ A high-precision computational study of gravitational interactions between three
 ![The Figure-Eight 3-Body Orbit](plots/figure_eight.png)
 *Figure 1: Successful verification of the Chenciner-Montgomery periodic solution. This result confirms the accuracy of the force calculation logic and the stability of the numerical integrator.*
 
+![Hamiltonian Energy Conservation](plots/energy_conservation.png)
+*Figure 2: Energy audit over $t=20$. Relative Hamiltonian error ($\Delta E/E_0$) is maintained at $\sim 10^{-9}$, verifying the physical validity of the simulation.*
+
 ## Research Achievements
 * **Verified Periodic Stability:** Successfully reproduced the "Figure-Eight" orbit, a zero-angular-momentum solution where all three bodies follow the same spatial locus.
+* **Hamiltonian Energy Audit:** Quantified the engine's physical precision, maintaining a relative energy error of $< 10^{-9}$ over extended simulations—proving the system adheres to the Law of Conservation of Energy.
 * **Precision Engineering:** Transitioned from basic integration to high-precision adaptive time-stepping via SciPy’s `solve_ivp` (RK45).
 * **Modular Architecture:** Developed a decoupled system where the vectorized gravitational engine in `src/physics.py` is independent of the numerical integration logic.
 * **Optimized Computation:** Implemented a vectorized $1/r^3$ force calculation using NumPy reshaping to bridge the gap between 2D physical coordinates and 1D state-space vectors.
 
 ## Research Objectives
 1.  **State-Space Modeling:** Characterize 3-body trajectories using a 12-variable vectorized state-space.
-2.  **Integrator Benchmarking:** Compare the long-term energy conservation of standard Runge-Kutta 4 (RK4) against symplectic methods.
-3.  **Chaos Analysis:** Visualize and quantify the transition from stable periodic orbits to total system collapse and stellar ejection.
+2. **Validation:** Monitor the Hamiltonian (Total Energy) to ensure physical consistency.
+3.  **Integrator Benchmarking:** Compare the long-term energy conservation of standard Runge-Kutta 4 (RK4) against symplectic methods.
+4.  **Chaos Analysis:** Visualize and quantify the transition from stable periodic orbits to total system collapse and stellar ejection.
 
 ## Methodology & Architecture
 * **Physics Engine:** Newtonian Gravity in a 2D plane using dimensionless units ($G=1$) for cleaner equations and improved numerical stability.
