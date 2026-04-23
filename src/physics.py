@@ -37,3 +37,27 @@ def get_derivatives(t:float, state:np.ndarray, masses:np.ndarray, G:float=1.0) -
     derivatives[6:] = accel.flatten() # dv/dt = a
     
     return derivatives
+
+def calculate_energy(state, masses, G=1.0):
+    """
+    Calculates the total energy (Kinetic + Potential) of the 3-body system.
+    """
+    # 1. Reshape for easy math
+    pos = state[:6].reshape((3, 2))
+    vel = state[6:].reshape((3, 2))
+    
+    # 2. Kinetic Energy (T = sum of 1/2 * m * v^2)
+    ke = 0
+    for i in range(3):
+        v_sq = np.dot(vel[i], vel[i])
+        ke += 0.5 * masses[i] * v_sq
+        
+    # 3. Potential Energy (V = -sum of G*mi*mj / rij)
+    pe = 0
+    for i in range(3):
+        for j in range(i + 1, 3): # Avoid double counting and self-interaction
+            r_vec = pos[j] - pos[i]
+            dist = np.linalg.norm(r_vec)
+            pe -= (G * masses[i] * masses[j]) / dist
+            
+    return ke + pe, ke, pe
