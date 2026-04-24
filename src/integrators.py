@@ -1,7 +1,7 @@
 import numpy as np
 from scipy.integrate import solve_ivp
 
-def run_simulation(physics_func, t_span, y0, masses, G=1.0, rtol=1e-9, atol=1e-12):
+def run_simulation(physics_func, t_span, y0, masses, G=1.0, rtol=1e-9, atol=1e-12, t_eval=None):
     """
     Wrapper for Scipy's adaptive integrator.
     
@@ -15,6 +15,8 @@ def run_simulation(physics_func, t_span, y0, masses, G=1.0, rtol=1e-9, atol=1e-1
         args=(masses, G),
         rtol=rtol,
         atol=atol,
-        dense_output=True # For smooth plot
+        dense_output=True,
+        t_eval=t_eval  
+
         )
     return sol

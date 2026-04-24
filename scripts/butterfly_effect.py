@@ -24,22 +24,29 @@ y0_perturbed = y0_control.copy()
 y0_perturbed[6] += 1e-4
 
 # Run both simulations
-t_span = (0, 15)
-sol_a = run_simulation(get_derivatives, t_span, y0_control, masses)
-sol_b = run_simulation(get_derivatives, t_span, y0_perturbed, masses)
+t_span = (0, 60)
+t_eval = np.linspace(t_span[0], t_span[1], 5000) # 5,000 even points
+sol_a = run_simulation(get_derivatives, t_span, y0_control, masses, t_eval=t_eval)
+sol_b = run_simulation(get_derivatives, t_span, y0_perturbed, masses, t_eval=t_eval)
 
-# Plotting the divergence
+# Visualization: The Unzipping Trajectories
 plt.figure(figsize=(10, 6))
-
-# Plot Body 1 from Control (Solid line)
-plt.plot(sol_a.y[0], sol_a.y[1], color='blue', alpha=0.6, label='Control (Body 1)')
-
-# Plot Body 1 from Perturbed (Dashed line)
-plt.plot(sol_b.y[0], sol_b.y[1], color='red', linestyle='--', alpha=0.8, label='Perturbed (Body 1)')
-
-plt.title("The butterfly effect: Figure-Eight Sensitivity")
-plt.xlabel("x")
-plt.ylabel("y")
+plt.plot(sol_a.y[0], sol_a.y[1], color='blue', alpha=0.5, label='Control')
+plt.plot(sol_b.y[0], sol_b.y[1], color='red', linestyle='--', alpha=0.8, label='Perturbed')
+plt.title("Long-Term Divergence: The Death of the Figure-Eight")
 plt.legend()
-plt.grid(True, alpha=0.3)
-plt.savefig('plots/butterfly_effect.png')
+plt.savefig('plots/butterfly_extended.png')
+
+# Visualization: Logarithmic Divergence (Quantitative Chaos)
+plt.figure(figsize=(10, 5))
+# Ensure we compare the same time points
+delta_y = sol_a.y - sol_b.y
+separation = np.linalg.norm(delta_y, axis=0)
+
+plt.semilogy(sol_a.t, separation, color='darkred')
+plt.title("Growth of Phase-Space Distance (Lyapunov Divergence)")
+plt.ylabel(r"Distance ($||\Delta y||$)")
+plt.xlabel("Time")
+plt.grid(True, which="both", alpha=0.2)
+plt.savefig('plots/divergence_plot.png')
+plt.show()

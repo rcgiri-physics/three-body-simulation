@@ -93,3 +93,20 @@ The energy audit confirms that the system is highly conserved. The relative ener
 * **Drift Observation:** A slight linear downward trend is visible in the error plot. This is a characteristic "feature" of the RK45 integrator; because it is not symplectic, it does not perfectly preserve the area in phase space, leading to a tiny, systematic energy leak. For the current scope, this drift is negligible, but it provides a strong justification for implementing a Velocity-Verlet solver in the next phase.
 
 **Current Status:** The physics engine is now fully validated and verified. The system is computationally stable and ready for experimental perturbation.
+
+## April 24, 2026
+**Status:** Day 6 - Quantitative Chaos & Resynchronization
+
+**Focus:** Measuring the Lyapunov divergence of the Figure-Eight orbit.
+
+### Accomplishments:
+* **Code Refinement:** Updated `src/integrators.py` to support `t_eval`, allowing for direct comparison of asynchronous adaptive time-steps.
+* **Extended Simulation:** Increased horizon to $t=60$ to track long-term divergence.
+* **Analysis:** Generated `plots/butterfly_extended.png` and `plots/divergence_plot.png`.
+
+### Technical Observations:
+* **The Broadcasting Success:** Using `t_eval` fixed the dimensionality mismatch caused by the adaptive stepper's response to the perturbation.
+* **Divergence Rate:** The distance $||\Delta y||$ grew from $10^{-4}$ to $\approx 2 \times 10^{-2}$ over 60 time units. While the orbit visually maintains its shape, the log-scale plot reveals a clear, oscillating upward trend.
+* **Lyapunov Signature:** The linear slope on the semi-log plot is the "signature" of exponential divergence. The oscillations correspond to the orbital frequency, showing that chaos is most active during high-velocity close encounters.
+
+**Current Status:** Chaos is quantified. The Figure-Eight is mathematically unstable, though numerically resilient over short-to-medium time scales.
