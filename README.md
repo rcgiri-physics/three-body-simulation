@@ -57,6 +57,12 @@ git clone [https://github.com/rcgiri-physics/three-body-simulation.git](https://
 # Install dependencies
 pip install -r requirements.txt
 
-# Run the verified Figure-Eight simulation
+# Run the high-precision Figure-Eight orbit using the adaptive SciPy solver.
 python -m scripts.run_simulation
+
+# Compare the long-term energy stability of RK45 against the custom Velocity-Verlet engine.
+python -m scripts.compare_integrators
+
+# Quantify the "Butterfly Effect" by tracking the exponential divergence of perturbed trajectories.
+python -m scripts.run_chaos_analysis
 ```
