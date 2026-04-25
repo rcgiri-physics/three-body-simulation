@@ -15,12 +15,21 @@ A high-precision computational study of gravitational interactions between three
 ![Hamiltonian Energy Conservation](plots/energy_conservation.png)
 *Figure 2: Energy audit over $t=20$. Relative Hamiltonian error ($\Delta E/E_0$) is maintained at $\sim 10^{-9}$, verifying the physical validity of the simulation.*
 
+![Integrator Showdown](plots/integrator_comparison.png)
+*Figure 3: Energy Stability Showdown. While the adaptive RK45 solver (blue) exhibits a systematic "secular drift" in energy, the custom Velocity-Verlet engine (red/brown) maintains bounded energy error—proving its superiority for long-term physical consistency.*
+
+![Chaos Divergence](plots/divergence_plot.png)
+*Figure 4: Quantitative Chaos. A tiny initial perturbation of $10^{-4}$ grows exponentially to $\approx 2 \times 10^{-2}$ over 60 time units, providing a clear Lyapunov signature of the system's sensitivity to initial conditions.*
+
 ## Research Achievements
 * **Verified Periodic Stability:** Successfully reproduced the "Figure-Eight" orbit, a zero-angular-momentum solution where all three bodies follow the same spatial locus.
 * **Hamiltonian Energy Audit:** Quantified the engine's physical precision, maintaining a relative energy error of $< 10^{-9}$ over extended simulations—proving the system adheres to the Law of Conservation of Energy.
 * **Precision Engineering:** Transitioned from basic integration to high-precision adaptive time-stepping via SciPy’s `solve_ivp` (RK45).
 * **Modular Architecture:** Developed a decoupled system where the vectorized gravitational engine in `src/physics.py` is independent of the numerical integration logic.
 * **Optimized Computation:** Implemented a vectorized $1/r^3$ force calculation using NumPy reshaping to bridge the gap between 2D physical coordinates and 1D state-space vectors.
+* **Symplectic Engineering:** Developed a custom Velocity-Verlet (leapfrog) engine in src/integrators.py to eliminate numerical energy dissipation found in standard adaptive solvers.
+* **Chaos Quantification:** Measured the Lyapunov divergence of the Figure-Eight orbit, documenting an exponential error growth from $10^{-4}$ to $\approx 2 \times 10^{-2}$ over 60 time units.
+* **Integrator Benchmarking:** Conducted a long-term "Showdown" audit ($t=100$) that verified the stochastic stability of symplectic methods compared to the monotonic drift of non-symplectic solvers.
 
 ## Research Objectives
 1.  **State-Space Modeling:** Characterize 3-body trajectories using a 12-variable vectorized state-space.

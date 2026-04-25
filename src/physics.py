@@ -61,3 +61,15 @@ def calculate_energy(state, masses, G=1.0):
             pe -= (G * masses[i] * masses[j]) / dist
             
     return ke + pe, ke, pe
+
+def compute_accelerations(pos, masses, G=1.0):
+    pos_rs = pos.reshape((3,2))
+    acc = np.zeros((3,2))
+
+    for i in range(3):
+        for j in range(3):
+            if i==j: continue
+            r_vec = pos_rs[j] - pos_rs[i]
+            dist = np.linalg.norm(r_vec)
+            acc[i] += G*masses[j] * r_vec / (dist**3)
+    return acc.flatten()

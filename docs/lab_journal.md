@@ -110,3 +110,36 @@ The energy audit confirms that the system is highly conserved. The relative ener
 * **Lyapunov Signature:** The linear slope on the semi-log plot is the "signature" of exponential divergence. The oscillations correspond to the orbital frequency, showing that chaos is most active during high-velocity close encounters.
 
 **Current Status:** Chaos is quantified. The Figure-Eight is mathematically unstable, though numerically resilient over short-to-medium time scales.
+
+## April 25, 2026
+**Status:** Saturday Sprint - Symplectic Integration & Performance Benchmarking  
+**Focus:** Solving numerical energy dissipation in long-term 3-body simulations.
+
+### Part 1: Architectural Implementation (The Build)
+The primary goal of today's research was to transition from general-purpose adaptive solvers to a **Symplectic Integrator**. While SciPy’s RK45 is highly precise for short-term dynamics, it lacks the geometric properties required to conserve the Hamiltonian (Total Energy) of a gravitational system over extended time horizons.
+
+#### Key Developments:
+* **Physics Refactoring:** Implemented `compute_accelerations` in `src/physics.py`. Unlike the standard state-vector derivative, this function isolates the gravitational force calculation, allowing for the staggered updates of positions and velocities required by the Verlet algorithm.
+* **Engine Development:** Authored a custom **Velocity-Verlet** solver in `src/integrators.py`. This implementation uses a "leapfrog" approach, updating velocity at the half-step ($t + \Delta t/2$) before computing the final position and acceleration at $t + \Delta t$.
+
+**The implemented Velocity-Verlet update rule:**
+1. $$v\left(t + \frac{\Delta t}{2}\right) = v(t) + \frac{1}{2} a(t) \Delta t$$
+2. $$r(t + \Delta t) = r(t) + v\left(t + \frac{\Delta t}{2}\right) \Delta t$$
+3. $$v(t + \Delta t) = v\left(t + \frac{\Delta t}{2}\right) + \frac{1}{2} a(t + \Delta t) \Delta t$$
+
+---
+
+### Part 2: The Integrator Showdown (The Result)
+To verify the engine's efficacy, a "torture test" was conducted over $t=100$ time units, comparing the stability of the Figure-Eight orbit under the standard RK45 vs. the new Velocity-Verlet engine.
+
+#### Technical Observations (integrator_comparison.png):
+* **Secular Drift in RK45:** The adaptive SciPy solver shows a clear, monotonic increase in relative energy error. This "energy leak" is a signature of non-symplectic integrators, where numerical dissipation slowly alters the system's total Hamiltonian over time.
+* **Bounded Error in Velocity-Verlet:** Despite using a fixed time step ($\Delta t = 0.005$), the Verlet engine maintains **stochastic stability**. The energy error oscillates due to the resolution of the step, but the mean error remains constant. It does not drift, ensuring the system remains physically consistent indefinitely.
+
+#### Quantitative Chaos (divergence_plot.png):
+The Lyapunov divergence plot confirms that while the Figure-Eight is a mathematical solution, it is dynamically unstable. A $10^{-4}$ perturbation grew exponentially to $\Delta y_{final} \approx 2 \times 10^{-2}$ over 60 time units. The rate of divergence peaked during high-velocity close encounters in the central gravitational well, as evidenced by the periodic "spikes" in the phase-space distance.
+
+### Scientific Conclusion:
+The implementation of a symplectic engine is a critical milestone for the project. While the Figure-Eight is visually stable in both solvers, the Velocity-Verlet engine is the only one that truly respects the conservation laws of physics for long-duration studies. This establishes a robust framework for investigating the "point of no return" in chaotic stellar ejections.
+
+**Current Status:** Phase 2 (Validation) and Phase 3 (Chaos) are complete. The lab is now fully equipped with a long-term stable research engine.
