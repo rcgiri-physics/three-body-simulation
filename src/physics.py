@@ -1,75 +1,77 @@
+# pylint: disable=invalid-name
+"""
+Core physics calculations for the N-Body gravity engine.
+"""
 import numpy as np
 
-def get_derivatives(t:float, state:np.ndarray, masses:np.ndarray, G:float=1.0) -> np.ndarray:
+
+def compute_accelerations(pos, masses, G=1.0, softening=0.0001):
+    """Calculates vectorized accelerations with gravitational softening."""
+    # ADDED THIS LINE: Reshape flat position array to (3,2)
+    pos_rs = pos.reshape((3, 2))
+
+    # 1. Broadcasting to get all r_vecs at once. Shape: (3, 3, 2)
+    diff = pos_rs[np.newaxis, :, :] - pos_rs[:, np.newaxis, :]
+
+    # 2. Distance squared. Shape: (3, 3)
+    dist_sq = np.sum(diff**2, axis=-1)
+
+    # 3. Softened denominator. Shape: (3, 3)
+    inv_dist_cubed = (dist_sq + softening**2) ** -1.5
+
+    # 4. Remove self-interaction (diagonal)
+    np.fill_diagonal(inv_dist_cubed, 0.0)
+
+    # 5. Multiply by masses and sum along the j-axis. Shape: (3, 2)
+    acc = G * np.sum(
+        diff * masses[np.newaxis, :, np.newaxis] * inv_dist_cubed[:, :, np.newaxis],
+        axis=1,
+    )
+    return acc.flatten()
+
+
+def get_derivatives(
+    _t: float, state: np.ndarray, masses: np.ndarray, G: float = 1.0
+) -> np.ndarray:
     """
     Calculates the derivatives for a 3-body system in a 2D plane.
-    
-    State vector structure (12 elements):
-    [x1, y1, x2, y2, x3, y3, vx1, vy1, vx2, vy2, vx3, vy3]
     """
-    # 1. Unpack and Reshape
-    # Positions: (3 bodies, 2 coordinates)
-    pos = state[:6].reshape((3, 2))
-    # Velocities: (3 bodies, 2 coordinates)
-    vel = state[6:].reshape((3, 2))
-    
-    # 2. Prepare the acceleration container
-    accel = np.zeros((3, 2))
-    
-    # 3. Calculate Gravitational Pull
-    for i in range(3):
-        for j in range(3):
-            if i == j:
-                continue # A body doesn't pull itself
-            
-            # Vector from body i to body j
-            r_vec = pos[j] - pos[i]
-            
-            # Distance (Magnitude of the vector)
-            dist = np.linalg.norm(r_vec)
-            
-            # Newton's Law: a = G * m_j * r_vec / dist^3
-            accel[i] += G * masses[j] * r_vec / (dist**3)
-            
-    # 4. Repack into a flat 1D array for the solver
+    vel = state[6:]  # Extract velocities
+
+    # Use the new, fast, softened acceleration function!
+    accel = compute_accelerations(state[:6], masses, G, softening=0.0001)
+
     derivatives = np.zeros(12)
-    derivatives[:6] = vel.flatten()   # dr/dt = v
-    derivatives[6:] = accel.flatten() # dv/dt = a
-    
+    derivatives[:6] = vel  # dr/dt = v
+    derivatives[6:] = accel  # dv/dt = a
+
     return derivatives
 
+
 def calculate_energy(state, masses, G=1.0):
-    """
-    Calculates the total energy (Kinetic + Potential) of the 3-body system.
-    """
-    # 1. Reshape for easy math
+    """Calculates the total energy (Kinetic + Potential)."""
     pos = state[:6].reshape((3, 2))
     vel = state[6:].reshape((3, 2))
-    
-    # 2. Kinetic Energy (T = sum of 1/2 * m * v^2)
-    ke = 0
-    for i in range(3):
-        v_sq = np.dot(vel[i], vel[i])
-        ke += 0.5 * masses[i] * v_sq
-        
-    # 3. Potential Energy (V = -sum of G*mi*mj / rij)
+
+    ke = np.sum(0.5 * masses * np.sum(vel**2, axis=1))
+
     pe = 0
     for i in range(3):
-        for j in range(i + 1, 3): # Avoid double counting and self-interaction
+        for j in range(i + 1, 3):
             r_vec = pos[j] - pos[i]
             dist = np.linalg.norm(r_vec)
             pe -= (G * masses[i] * masses[j]) / dist
-            
+
     return ke + pe, ke, pe
 
-def compute_accelerations(pos, masses, G=1.0):
-    pos_rs = pos.reshape((3,2))
-    acc = np.zeros((3,2))
 
-    for i in range(3):
-        for j in range(3):
-            if i==j: continue
-            r_vec = pos_rs[j] - pos_rs[i]
-            dist = np.linalg.norm(r_vec)
-            acc[i] += G*masses[j] * r_vec / (dist**3)
-    return acc.flatten()
+def check_ejection(state, threshold=15.0):
+    """Returns True if any two bodies are separated by more than the threshold."""
+    pos = state.reshape(-1, 2)[:3]
+    # Calculate distances between the bodies
+    d12 = np.linalg.norm(pos[0] - pos[1])
+    d13 = np.linalg.norm(pos[0] - pos[2])
+    d23 = np.linalg.norm(pos[1] - pos[2])
+
+    # If any two bodies are too far apart, the system is broken
+    return max(d12, d13, d23) > threshold
