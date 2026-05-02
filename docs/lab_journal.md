@@ -143,3 +143,18 @@ The Lyapunov divergence plot confirms that while the Figure-Eight is a mathemati
 The implementation of a symplectic engine is a critical milestone for the project. While the Figure-Eight is visually stable in both solvers, the Velocity-Verlet engine is the only one that truly respects the conservation laws of physics for long-duration studies. This establishes a robust framework for investigating the "point of no return" in chaotic stellar ejections.
 
 **Current Status:** Phase 2 (Validation) and Phase 3 (Chaos) are complete. The lab is now fully equipped with a long-term stable research engine.
+
+## May 2, 2026
+**Status:** Ejection Thresholds & Mathematical Validation
+
+**Focus:** Finding the point of no return and proving the engine on real-world Keplerian systems.
+
+### Accomplishments:
+* **Sensitivity Sweep:** Authored `scripts/run_sensitivity_sweep.py` to incrementally inject kinetic energy into the Figure-Eight orbit. 
+* **Discovery:** Identified the critical velocity perturbation threshold ($\delta \approx 0.5$). Below this, the chaotic system remains gravitationally bound. Above this, the kinetic energy overcomes the binding energy, snapping the system.
+* **Cinematic Rendering:** Created a momentum-balanced visualization script (`scripts/animate_collapse.py`) to capture the total system collapse and a 1-star ejection while keeping the center-of-mass anchored.
+* **Solar System Validation:** To prove the Verlet integrator doesn't just work on abstract chaos, I tested it on the Sun, Earth, and Jupiter. By switching to Astronomical Units and setting $G = 4\pi^2$, the simulation perfectly rendered 12 years of stable, closed Keplerian orbits without a single drop of energy leakage.
+* **Codebase Polish:** Finalized the public API in `src/__init__.py` and successfully configured the linter to respect standard physics notation (capital `G`).
+
+### Scientific Conclusion:
+The 3-Body Laboratory is complete. What started as a basic RK45 ODE solver evolved into a custom symplectic physics engine capable of quantifying chaos, visualizing total system disintegration, and modeling real-world orbital mechanics. The architectural separation of the physics, the integrators, and the experiment scripts proved to be a highly resilient software design.

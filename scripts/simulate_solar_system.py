@@ -75,7 +75,6 @@ def run_solar_system():
     plt.scatter(pos_data[0, 1, 0], pos_data[0, 1, 1], color="blue", s=50, zorder=5)
     plt.scatter(pos_data[0, 2, 0], pos_data[0, 2, 1], color="orange", s=80, zorder=5)
 
-    # FIXED: Removed the 'f' prefix from this string
     plt.title("Solar System Simulation (12 Years)\nG = 4π²")
     plt.xlabel("Astronomical Units (AU)")
     plt.ylabel("Astronomical Units (AU)")
