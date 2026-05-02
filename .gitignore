@@ -222,6 +222,10 @@ plots/*.mp4
 plots/*.avi
 plots/*.mov
 plots/*.gif
+plots/*
+!plots/system_collapse.gif
+!plots/solar_system.png
+!plots/figure_eight.png
 
 # Keep the directory structure even if folders are empty
 !data/.gitkeep
