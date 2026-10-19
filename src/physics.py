@@ -48,8 +48,12 @@ def get_derivatives(
     return derivatives
 
 
-def calculate_energy(state, masses, G=1.0):
-    """Calculates the total energy (Kinetic + Potential)."""
+def calculate_energy(state, masses, G=1.0, softening=0.0001):
+    """Calculates the total energy (Kinetic + Potential).
+
+    The potential uses the same softening as compute_accelerations, so this is
+    the quantity the softened dynamics actually conserves.
+    """
     pos = state[:6].reshape((3, 2))
     vel = state[6:].reshape((3, 2))
 
@@ -59,7 +63,7 @@ def calculate_energy(state, masses, G=1.0):
     for i in range(3):
         for j in range(i + 1, 3):
             r_vec = pos[j] - pos[i]
-            dist = np.linalg.norm(r_vec)
+            dist = np.sqrt(np.dot(r_vec, r_vec) + softening**2)
             pe -= (G * masses[i] * masses[j]) / dist
 
     return ke + pe, ke, pe
