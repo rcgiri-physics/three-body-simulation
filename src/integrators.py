@@ -66,7 +66,12 @@ def run_verlet_simulation(y0, masses, t_span, dt, G=1.0):
     Acts as a wrapper around verlet_step.
     """
     t_start, t_end = t_span
-    times = np.arange(t_start, t_end, dt)
+    # Include t_end: np.arange(t_start, t_end, dt) stopped one step short, and with a
+    # float dt its length depends on rounding. dt is adjusted slightly so that a
+    # whole number of steps lands exactly on t_end.
+    n_intervals = max(1, int(round((t_end - t_start) / dt)))
+    dt = (t_end - t_start) / n_intervals
+    times = t_start + dt * np.arange(n_intervals + 1)
     n_steps = len(times)
 
     # Pre-allocate states array: (12 rows, n_steps columns)
